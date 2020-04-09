@@ -1,4 +1,3 @@
-//var system_app;
 //system_app.controller('chatbot-controller', function($scope, $http) {
 
 //});
@@ -8,7 +7,7 @@ $(document).ready(function() {
     // please change the accessToken to configure this to work with yoru Dialogflow agent
     // var baseUrl = "https://api.api.ai/v1/query?v=20160910&";
     var baseUrl = "https://api.dialogflow.com/v1/query?v=20170712&";
-    var accessToken = "6e5c2c2195084691937add3ae219e397"; // VIDURA bot 
+    var accessToken = "f084fec91b874243b5a2d836d23f35d1"; // VIDURA bot 
     // var accessToken = "553ab6017e584e0fa351952c8c9ca956"; // ashwin demo bot
 
     // ------------- declare and intialize chat window widget variables ----------------//
@@ -48,11 +47,11 @@ $(document).ready(function() {
 		console.log(isOldUser);
 		if (isOldUser) {
 			console.log(isOldUser);
-			setBotResponse('Hello! ' +userName+' welcome back. How can I help you today?');
+			setBotResponse('Hello! ' +userName+' welcome back to HonestChain portal. How can I help you today?');
 			console.log("old user");
 		}
 		else {
-			setBotResponse('Hello! '+ userName+' welcome.');
+			setBotResponse('Hello! '+ userName+' welcome to HonestChain portal.');
 			localStorage.setItem('name', 'arjun');
 			console.log("new user");
 			setBotResponse('To assist you better , can you please fill this short survey to get personalized responses.\
@@ -183,6 +182,14 @@ $(document).ready(function() {
     	var speech = data.result.fulfillment.speech;
         // use incomplete if you use required in api.ai questions in intent
         // check if actionIncomplete = false
+	$.post( "/save_dialog", { data : JSON.stringify(data)}
+		
+		
+    ); 
+	    
+	    // .done(function(data) {
+                                   //     console.log("Response: " + data);
+                               //});
         var incomplete = data.result.actionIncomplete;
         if(data.result.fulfillment.messages) { // check if messages are there
             if(data.result.fulfillment.messages.length > 0) { //check if quick replies are there

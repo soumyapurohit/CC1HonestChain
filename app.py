@@ -11,6 +11,7 @@ from sqlalchemy.engine import Engine
 from sqlalchemy import event
 import os
 import psycopg2
+import json
 
 from wtforms_sqlalchemy.fields import QuerySelectField
 #from wtforms.ext.sqlalchemy.fields import QuerySelectField
@@ -59,6 +60,8 @@ class RequestForm(UserMixin, db.Model):
     #requests = db.relationship('RequestForm', backref = 'user', lazy = True)
     #datasets = db.relationship('RequestForm', backref = 'dataset', lazy = True)
 
+class trial(UserMixin, db.Model):
+    data_set_name=db.Column(db.String(40),primary_key = True)
 
 
 #class SelectFieldtypedata(db.Model):
@@ -108,7 +111,6 @@ class CreateRequestForm(FlaskForm):
     soondata=StringField('How soon data needs to be accessible', validators=[InputRequired(), Length(min=4, max=40)])
     #dstype = QuerySelectField(query_factory=choice_typeofdata, allow_blank=True)
     typeofdata=StringField('What type of data would you like to receive', validators=[InputRequired(), Length(min=4, max=40)])
-
 
 @app.route('/')
 def index():
@@ -432,7 +434,7 @@ def denyreq(req_id):
     return render_template('dashboard_admin.html', name = current_user.username, pending_req= pending_req, approvedreq_info=approvedreq_info, denyreq_info = denyreq_info)
 
 @app.route('/request',methods=['GET','POST'])
-def request():
+def request_form():
     form = CreateRequestForm()
     return render_template('request.html', form=form)
    # return render_template('bot/index_bot.html', form=form)
@@ -442,6 +444,27 @@ def enter_request():
     form = CreateRequestForm()
     return render_template('request.html', form=form)
 
+@app.route('/save_dialog', methods=['POST'])			
+def save_dialog():
+    a =request.form['data']
+    print type(a)
+    a=a.encode("utf-8")
+    print type(a)
+    dic =json.loads(a)
+    print type(dic)
+    print dic
+    text = dic[u'result'][u'resolvedQuery']
+    print type(text)
+    print text
 
+    #with sql.connect("database.db") as con:
+    # cur = con.cursor()
+        #cur.execute("INSERT data into trial (text, time) values (?,?)",(data, int(time())))
+    record=trial(data_set_name=text)
+    db.session.add(record)
+    db.session.commit()
+    return "Saved successfully"
+    #return "Failed to save."
+    
 if __name__ == '__main__':
     app.run(host = '0.0.0.0', debug=True)
