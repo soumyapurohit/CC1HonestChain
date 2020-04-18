@@ -119,9 +119,10 @@ Dashboard
               <tbody>
                 <tr>
 			{% for new_request in request_info %}
-			<td><a href = " {{url_for('pendrequest') }} ">{{new_request.trustid}}</a></td>
-			<td id = "requestname">{{new_request.status}}</td>
-			<td>{{new_request.status}}</td> 
+	<td><a href = "#"  onclick = "view('{{new_request.requestid}}')" id = '{{new_request.requestid}}'  method ="GET">{{new_request.requestid}}</a></td>
+	<!--	<td><a href = " {{url_for('pendrequest') }} ">{{new_request.requestid}}</a></td> -->
+			<td id = "requestname">{{new_request.requestname}}</td>
+			<td>{{new_request.requestDescription}}</td> 
     			
                 </tr>
 		{% endfor %}

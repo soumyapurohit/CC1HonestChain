@@ -277,29 +277,29 @@ def dashboard():
     #conn.close()
     
 
-    pending_req = TrustCalcForm.query.filter_by(status= 'pending').all()
-    approvedreq_info = TrustCalcForm.query.filter_by(status= 'approved').all()
-    denyreq_info = TrustCalcForm.query.filter_by(status= 'denied').all()
+    pending_req = RequestForm.query.filter_by(status= 'pending').all()
+    approvedreq_info = RequestForm.query.filter_by(status= 'approved').all()
+    denyreq_info = RequestForm.query.filter_by(status= 'denied').all()
     for i in pending_req:
-        print("pending request id is",i.trustid)
+        print("pending request id is",i.requestid)
 
     
     if(current_user.username == 'Admin'):
         return render_template('dashboard_admin.html', name = current_user.username, pending_req= pending_req, approvedreq_info= approvedreq_info, denyreq_info=denyreq_info, resultset=resultset)
     elif(current_user.username == 'internaluser'):
         print('internal user dashboard')
-        apprInternal_info = TrustCalcForm.query.filter_by(ownerid=current_user.id ,status = 'approved').all()
-        request_info = TrustCalcForm.query.filter_by(ownerid=current_user.id ,status = 'pending').all()
-        deniedInternal_info = TrustCalcForm.query.filter_by(ownerid=current_user.id ,status = 'denied').all()
+        apprInternal_info = RequestForm.query.filter_by(ownerid=current_user.id ,status = 'approved').all()
+        request_info = RequestForm.query.filter_by(ownerid=current_user.id ,status = 'pending').all()
+        deniedInternal_info = RequestForm.query.filter_by(ownerid=current_user.id ,status = 'denied').all()
         for i in apprInternal_info:
             print("Internal user approved request is ",i.requestname)
         return render_template('dashboard.html', name = current_user.username, apprInternal_info= apprInternal_info, request_info=request_info, deniedInternal_info = deniedInternal_info, resultset = resultset)
     else:
         print('external user dashboard')
-        apprInternal_info = TrustCalcForm.query.filter_by(ownerid=current_user.id ,status = 'approved').all()
+        apprInternal_info = RequestForm.query.filter_by(ownerid=current_user.id ,status = 'approved').all()
         print('Id for external user is Hi',current_user.id)
-        request_info = TrustCalcForm.query.filter_by(ownerid=current_user.id ,status = 'pending').all()
-        deniedInternal_info = TrustCalcForm.query.filter_by(ownerid=current_user.id ,status = 'denied').all()
+        request_info = RequestForm.query.filter_by(ownerid=current_user.id ,status = 'pending').all()
+        deniedInternal_info = RequestForm.query.filter_by(ownerid=current_user.id ,status = 'denied').all()
         for i in apprInternal_info:
             print("Internal user approved request is ",i.requestname)
         return render_template('dashboard_external.html', name = current_user.username, apprInternal_info= apprInternal_info, request_info=request_info, deniedInternal_info = deniedInternal_info, resultset = resultset)
