@@ -18,25 +18,22 @@
 
 namespace org.example.biznet
 
-participant SampleParticipant identified by participantId {
-  o String participantId
-  o String firstName
-  o String lastName
+/**
+ * My commodity trading network
+ */
+asset Commodity identified by tradingSymbol {
+    o String tradingSymbol
+    o String description
+    o String mainExchange
+    o Double quantity
+    --> Trader owner
 }
-
-asset SampleAsset identified by assetId {
-  o String assetId
-  --> SampleParticipant owner
-  o String value
+participant Trader identified by tradeId {
+    o String tradeId
+    o String firstName
+    o String lastName
 }
-
-transaction SampleTransaction {
-  --> SampleAsset asset
-  o String newValue
-}
-
-event SampleEvent {
-  --> SampleAsset asset
-  o String oldValue
-  o String newValue
+transaction Trade {
+    --> Commodity commodity
+    --> Trader newOwner
 }
