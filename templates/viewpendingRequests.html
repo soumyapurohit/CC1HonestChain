@@ -1,3 +1,4 @@
+  
 {% extends "bootstrap/base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
 
@@ -27,31 +28,91 @@ Sign Up
  <table class="table table-striped">
               <thead>
                 <tr>
-                  <th>Requestname</th>
-                  <th>requestDescription</th>
-                  <th>Usage of data</th>
-		  <th>Storage of data </th>
-		  <th>How long data required</th>
-		  <th>How soon data required</th>
-		  <th>Type of data</th>
-		  <th>Risk Level</th>
+                  <th>Radiology Images</th>
+                  <th>Radiology Imaging Reports</th>
+		  <th>EKG</th>
+		  <th>Progress Notes</th>
+		  <th>History</th>
+		  <th>Operational Report</th>
+		  <th>Pathology Report</th>
+		  <th>Laboratory Report</th>
+			<th>Photographs</th>
+		  <th>Discharge Summaries</th>
+		  <th>Health Care Billing</th>
+			<th>Consultation</th>
+		  <th>Medication</th>
+		  <th>Emergency</th>
+		  <th>Dental</th>
+		  <th>Demographic</th>
+		  <th>Question</th>
+		  <th>Audiotape</th>
+		  <th>Beta Value</th>
+		  <th>Dirichlet value</th>
+		 
 		  
                 </tr>
               </thead>
               <tbody>
                 
-			</thead>
-                    <tbody>
+			
+                   
 			    <tr> 
 				    {% for pendingreq_info in pendingreq_info %}
-				    <td>{{pendingreq_info.requestname}}</td>
-                              	    <td>{{pendingreq_info.requestDescription}}</td>
-				    <td>{{pendingreq_info.use}}</td>
-				    <td>{{pendingreq_info.store}}</td>
-				    <td>{{pendingreq_info.longdata}}</td>
-				    <td>{{pendingreq_info.soondata}}</td>
-				    <td>{{pendingreq_info.typeofdata}}</td>
-				    <td>{{pendingreq_info.risk_level}}</td>
+				    <td>{{pendingreq_info.radiology_images}}</td>
+			    
+			   
+                              	    <td>{{pendingreq_info.radiology_imaging_reports}}</td>
+			    
+				    <td>{{pendingreq_info.ekg}}</td>
+			    
+				    <td>{{pendingreq_info.progress_notes}}</td>
+			    
+			   
+				    <td>{{pendingreq_info.history_phy}}</td>
+			    
+			   
+				    <td>{{pendingreq_info.oper_report}}</td>
+			    
+			   
+				    <td>{{pendingreq_info.path_report}}</td>
+			   
+			   
+				    <td>{{pendingreq_info.lab_report}}</td>
+			    
+			   
+				    <td>{{pendingreq_info.photographs}}</td>
+			    
+			   
+				    <td>{{pendingreq_info.discharge_summaries}}</td>
+			    
+			    
+				    <td>{{pendingreq_info.health_care_billing}}</td>
+			   
+			    
+				    <td>{{pendingreq_info.consult}}</td>
+			    
+			   
+				    <td>{{pendingreq_info.medication}}</td>
+			    
+			   
+				    <td>{{pendingreq_info.emergency}}</td>
+			    
+			    
+				    <td>{{pendingreq_info.dental}}</td>
+			    
+				    <td>{{pendingreq_info.demographic}}</td>
+			    
+			   
+				    <td>{{pendingreq_info.question}}</td>
+			    
+			   
+				    <td>{{pendingreq_info.audiotape}}</td>
+			    
+			    
+				    <td>{{pendingreq_info.beta}}</td>
+			    
+			    
+				    <td>{{pendingreq_info.dirichlet}}</td>
                                  {% endfor %} 
                             </tr>
 
@@ -59,8 +120,8 @@ Sign Up
                 </table>
 		{% for pendingreq_info in pendingreq_info %}
    
-		<button class="btn btn-lg btn-primary btn-block"  onclick = "appReq(' {{pendingreq_info.requestid}} ')" method = 'GET' type="button">Approve</button>
-		<button class="btn btn-lg btn-primary btn-block"  onclick = "denyReq('{{pendingreq_info.requestid}}')" method = 'GET' type="button">Deny</button>
+		<button class="btn btn-lg btn-primary btn-block"  onclick = "appReq(' {{pendingreq_info.trustid}} ')" method = 'GET' type="button">Approve</button>
+		<button class="btn btn-lg btn-primary btn-block"  onclick = "denyReq('{{pendingreq_info.trustid}}')" method = 'GET' type="button">Deny</button>
   
 	{% endfor %}	
 	</form>

@@ -1,8 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify, Response
 from flask_bootstrap import Bootstrap
-from math import log, exp
+from math import log, exp, floor
+from decimal import *
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField
+from wtforms import StringField, PasswordField, BooleanField, RadioField, SelectField
 from wtforms.validators import InputRequired, Email, Length
 from flask import flash
 from flask_sqlalchemy import SQLAlchemy
@@ -11,6 +12,7 @@ from sqlalchemy.engine import Engine
 from sqlalchemy import event
 import os
 import psycopg2
+import json
 
 from wtforms_sqlalchemy.fields import QuerySelectField
 #from wtforms.ext.sqlalchemy.fields import QuerySelectField
@@ -59,13 +61,88 @@ class RequestForm(UserMixin, db.Model):
     #requests = db.relationship('RequestForm', backref = 'user', lazy = True)
     #datasets = db.relationship('RequestForm', backref = 'dataset', lazy = True)
 
+class trial(UserMixin, db.Model):
+    data_set_name=db.Column(db.String(40),primary_key = True)
 
+
+class IrbInfo(UserMixin, db.Model):
+    irbunique = db.Column(db.Integer, primary_key = True, autoincrement = True)
+    irb_id = db.Column(db.String(10))
+
+class ItemInfo(UserMixin, db.Model):
+    itemid = db.Column(db.Integer, primary_key = True, autoincrement = True)
+    itemname = db.Column(db.String(40))
+    itemunique = db.Column(db.String(10))
+
+class TrustChoice(UserMixin, db.Model):
+    trustchoiceid = db.Column(db.Integer, primary_key = True, autoincrement = True)
+    decision = db.Column(db.String(40))
+    #trustchoices = db.relationship('TrustCalcForm', backref = 'trust_choice', lazy = 'dynamic')
+
+class TrustCalcForm(UserMixin, db.Model):
+    trustid = db.Column(db.Integer, primary_key = True, autoincrement = True)
+    radiology_images = db.Column(db.String(10))
+    radiology_imaging_reports = db.Column(db.String(10))
+    ekg = db.Column(db.String(10))
+    progress_notes = db.Column(db.String(10))
+    history_phy = db.Column(db.String(10))
+    oper_report = db.Column(db.String(10))
+    path_report = db.Column(db.String(10))
+    lab_report = db.Column(db.String(10))
+    photographs = db.Column(db.String(10))
+    #ssn = db.Column(db.String(10))
+    discharge_summaries = db.Column(db.String(10))
+    health_care_billing = db.Column(db.String(10))
+    consult = db.Column(db.String(10))
+    medication = db.Column(db.String(10))
+    emergency = db.Column(db.String(10))
+    dental = db.Column(db.String(10))
+    demographic = db.Column(db.String(10))
+    question = db.Column(db.String(10))
+    audiotape = db.Column(db.String(10))
+    #other = db.Column(db.String(10))
+    match = db.Column(db.String(10))
+    mismatch = db.Column(db.String(10))
+    undecided = db.Column(db.String(10))
+    beta = db.Column(db.String(10))
+    dirichlet = db.Column(db.String(10))
+    status = db.Column(db.String(10))
+    ownerid= db.Column(db.Integer, db.ForeignKey('user.id'),nullable=False)
+   # trustchoiceid = db.Column(db.Integer, db.ForeignKey('trust_choice.trustchoiceid'), nullable=False)
+
+class IdentifierCalcForm(UserMixin, db.Model):
+    identifier = db.Column(db.Integer, primary_key = True, autoincrement = True)
+    name = db.Column(db.String(10))
+    address = db.Column(db.String(10))
+    elements_of_dates = db.Column(db.String(10))
+    telephone_numbers = db.Column(db.String(10))
+    fax_numbers = db.Column(db.String(10))
+    email_address = db.Column(db.String(10))
+    ssn = db.Column(db.String(10))
+    medical_record_no = db.Column(db.String(10))
+    health_plan = db.Column(db.String(10))
+    account_no =  db.Column(db.String(10))
+    certificate_or_license = db.Column(db.String(10))
+    any_vehicle = db.Column(db.String(10))
+    web_url =db.Column(db.String(10))
+    ip_address = db.Column(db.String(10))
+    biometric_identifier = db.Column(db.String(10))
+    photographic_image = db.Column(db.String(10))
+    any_other_characteristics = db.Column(db.String(10))
+    ownerid= db.Column(db.Integer, db.ForeignKey('user.id'),nullable=False)
 
 #class SelectFieldtypedata(db.Model):
 #    datatype = db.Column(db.String(40))
 
 #class ChoiceOpts(FlaskForm):
 #    opts = QuerySelectField(query_factory = choice_dataset, allow_blank =True)
+
+
+def choice_irb():
+    return IrbInfo.query
+
+def choice_trustcalc():
+    return TrustChoice.query
 
 
 def choice_dataset():
@@ -109,6 +186,30 @@ class CreateRequestForm(FlaskForm):
     #dstype = QuerySelectField(query_factory=choice_typeofdata, allow_blank=True)
     typeofdata=StringField('What type of data would you like to receive', validators=[InputRequired(), Length(min=4, max=40)])
 
+class CreateTrustCalcForm(FlaskForm):
+    #CaStatus = QuerySelectField('Enter your choice', choices=[('Yes', 'Yes'), ('No', 'No'), ('Uncertain', 'Uncertain')])
+     irb_id = QuerySelectField(query_factory=choice_irb, allow_blank=True, get_label = 'irb_id')
+     radiology_images = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
+     radiology_imaging_reports = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
+     ekg = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
+     progress_notes = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
+     history_phy = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
+     oper_report = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
+     path_report = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
+     lab_report = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
+     photographs  = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
+     #ssn = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
+     discharge_summaries = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
+     health_care_billing = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
+     consult = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
+     medication = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
+     emergency = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
+     dental = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
+     demographic = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
+     question = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
+     audiotape = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
+     #other = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
+
 
 @app.route('/')
 def index():
@@ -122,7 +223,7 @@ def login():
         if user:
             if user.password == form.password.data:
                 login_user(user, remember=form.remember.data)
-                return redirect(url_for('dashboard'))
+                return redirect(url_for('intro'))
         return '<h1> Invalid Username or password </h1>'
 
         #return '<h1>' + form.username.data + ' ' + form.password.data + '</h1>'
@@ -143,6 +244,10 @@ def signup():
 
     return render_template('signup.html', form=form)
 
+@app.route('/intro')
+@login_required
+def intro():
+    return render_template('intro.html')
 
 @app.route('/dashboard')
 @login_required
@@ -172,29 +277,29 @@ def dashboard():
     #conn.close()
     
 
-    pending_req = RequestForm.query.filter_by(status= 'pending').all()
-    approvedreq_info = RequestForm.query.filter_by(status= 'approved').all()
-    denyreq_info = RequestForm.query.filter_by(status= 'denied').all()
+    pending_req = TrustCalcForm.query.filter_by(status= 'pending').all()
+    approvedreq_info = TrustCalcForm.query.filter_by(status= 'approved').all()
+    denyreq_info = TrustCalcForm.query.filter_by(status= 'denied').all()
     for i in pending_req:
-        print("pending request id is",i.requestid)
+        print("pending request id is",i.trustid)
 
     
     if(current_user.username == 'Admin'):
         return render_template('dashboard_admin.html', name = current_user.username, pending_req= pending_req, approvedreq_info= approvedreq_info, denyreq_info=denyreq_info, resultset=resultset)
     elif(current_user.username == 'internaluser'):
         print('internal user dashboard')
-        apprInternal_info = RequestForm.query.filter_by(ownerid=current_user.id ,status = 'approved').all()
-        request_info = RequestForm.query.filter_by(ownerid=current_user.id ,status = 'pending').all()
-        deniedInternal_info = RequestForm.query.filter_by(ownerid=current_user.id ,status = 'denied').all()
+        apprInternal_info = TrustCalcForm.query.filter_by(ownerid=current_user.id ,status = 'approved').all()
+        request_info = TrustCalcForm.query.filter_by(ownerid=current_user.id ,status = 'pending').all()
+        deniedInternal_info = TrustCalcForm.query.filter_by(ownerid=current_user.id ,status = 'denied').all()
         for i in apprInternal_info:
             print("Internal user approved request is ",i.requestname)
         return render_template('dashboard.html', name = current_user.username, apprInternal_info= apprInternal_info, request_info=request_info, deniedInternal_info = deniedInternal_info, resultset = resultset)
     else:
         print('external user dashboard')
-        apprInternal_info = RequestForm.query.filter_by(ownerid=current_user.id ,status = 'approved').all()
+        apprInternal_info = TrustCalcForm.query.filter_by(ownerid=current_user.id ,status = 'approved').all()
         print('Id for external user is Hi',current_user.id)
-        request_info = RequestForm.query.filter_by(ownerid=current_user.id ,status = 'pending').all()
-        deniedInternal_info = RequestForm.query.filter_by(ownerid=current_user.id ,status = 'denied').all()
+        request_info = TrustCalcForm.query.filter_by(ownerid=current_user.id ,status = 'pending').all()
+        deniedInternal_info = TrustCalcForm.query.filter_by(ownerid=current_user.id ,status = 'denied').all()
         for i in apprInternal_info:
             print("Internal user approved request is ",i.requestname)
         return render_template('dashboard_external.html', name = current_user.username, apprInternal_info= apprInternal_info, request_info=request_info, deniedInternal_info = deniedInternal_info, resultset = resultset)
@@ -208,6 +313,146 @@ def dashboard():
 def logout():
     logout_user()
     return redirect(url_for('index'))
+
+@app.route('/hipaaform', methods=['GET','POST'])
+def hipaaform():
+    print('in trust form')
+    form = CreateTrustCalcForm()
+    if form.validate_on_submit():
+        print('Form validated')
+    else:
+        print(form.errors)
+    return render_template('example2.html',form=form)
+
+
+@app.route('/pendrequest', methods=['GET','POST'])
+def pendrequest():
+    print('in trust form')
+    form = CreateTrustCalcForm()
+    if form.validate_on_submit():
+        print('Form validated')
+    else:
+        print(form.errors)
+    return render_template('example2.html',form=form)
+
+@app.route('/submithipaaform', methods=['GET','POST'])
+def submithipaa():
+     print(current_user.username)
+     form = CreateTrustCalcForm() 
+     irb_id = form.irb_id.data.irb_id
+
+     radiology_images = form.radiology_images.data.decision
+     radiology_imaging_reports = form.radiology_imaging_reports.data.decision
+     ekg = form.ekg.data.decision
+     progress_notes = form.progress_notes.data.decision
+     history_phy = form.history_phy.data.decision
+     oper_report = form.oper_report.data.decision
+     path_report = form.path_report.data.decision
+     lab_report = form.lab_report.data.decision
+     photographs = form.photographs.data.decision
+     #ssn = form.ssn.data.decision
+     discharge_summaries = form.discharge_summaries.data.decision
+     health_care_billing = form.health_care_billing.data.decision
+     consult = form.consult.data.decision
+     medication = form.medication.data.decision
+     emergency  = form.emergency.data.decision
+     dental = form.dental.data.decision
+     demographic = form.demographic.data.decision
+     question = form.question.data.decision
+     audiotape = form.audiotape.data.decision
+     #other = form.other.data.decision
+     
+     
+     templist = [radiology_images, radiology_imaging_reports, ekg, progress_notes, history_phy, oper_report, path_report, lab_report, photographs, discharge_summaries, health_care_billing, consult, medication, emergency, dental, demographic, question, audiotape]
+     if (current_user.username == 'internaluser'):
+         userrole = 'internal_user'
+     elif (current_user.username == 'externaluser'):
+         userrole = 'external_user'
+
+     
+     #item_select_query = "select itemunique from item_info  where itemname = radiology_images";
+     #item_info = ItemInfo.query.filter_by(itemname=radiology_images).all()
+
+     #print('after item info')
+     #print(item_info)
+     #for i in item_info:
+     #    print('item details',i)
+
+     postgreSQL_select_Query = "select * from data_policy_domain  where data_policy_domain.irb_number = %s"
+     cur.execute(postgreSQL_select_Query, [irb_id])
+     resultset = cur.fetchone()
+     print('resultset is',resultset)
+     d = resultset[1:]
+     
+            
+     countmismatch = 0
+     countundecided = 0
+     countmatch = 0
+     for a,b in zip(templist, d):
+         if (a == 'Yes' and (b == '1' or b  == None)):
+             countmatch += 1
+         elif (a == 'No' and b == '1'):
+             countmismatch += 1
+         elif (a == 'No' and b == None):
+             countmatch += 1
+         elif (a == 'Uncertain' and b == '1'):
+             countundecided += 1
+         elif (a == 'Uncertain' and b == None):
+             countmatch += 1
+     N = 18
+     # beta model trust calculation
+     alpha_c = floor(countmatch + ((countundecided*countmatch)/(countmatch+countmismatch)));
+     beta_c = N - alpha_c;
+     Ei = float(alpha_c + 1)/float(alpha_c + beta_c + 2);
+     Ei = format(Ei, '.2f')
+     print('Beta model is',Ei)
+    
+     
+     # Formula 7 of trust model
+     a = 0.7
+     Eb = float(countmatch+1.0) / float(countmatch+countmismatch+countundecided+3.0)
+     Eu = float(countundecided+1.0) / float(countmatch+countmismatch+countundecided+3.0)
+     Ew = (Eb + a*Eu)
+     
+     rEw = log(Ew)/log((1-Ew))
+     print('rEw',rEw)
+     #rEw = log(c)
+     if rEw > 0:
+         wi = 1 - exp(-abs(rEw))
+     elif rEw < 0:
+         wi = -(1 - exp(-abs(rEw)))
+     else:
+         wi = 0
+     wi = format(wi, '.2f')
+     print('dirichlet model is', wi)
+    
+     status = 'pending'
+     new_hipaa_request = TrustCalcForm(ownerid =  current_user.id, radiology_images = radiology_images, radiology_imaging_reports = radiology_imaging_reports, ekg = ekg, progress_notes = progress_notes, history_phy = history_phy, oper_report = oper_report, path_report = path_report, lab_report = lab_report, photographs = photographs, discharge_summaries = discharge_summaries,  health_care_billing= health_care_billing, consult = consult, medication = medication, emergency = emergency, dental  = dental, demographic = demographic,question = question, audiotape = audiotape, beta = Ei, dirichlet = wi, status = status)
+     db.session.add(new_hipaa_request)
+     db.session.commit()
+
+     request_info = TrustCalcForm.query.filter_by(ownerid=current_user.id, status = 'pending').all()
+     for i in request_info:
+         print("the trust id is", i.trustid)
+     apprInternal_info = TrustCalcForm.query.filter_by(ownerid=current_user.id, status = 'approved').all()
+     deniedInternal_info = TrustCalcForm.query.filter_by(ownerid=current_user.id, status= 'denied').all()
+
+     if(current_user.username == 'internaluser'):
+         return render_template('dashboard.html', form=form, request_info=request_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info)
+     elif(current_user.username == 'externaluser'):
+         return render_template('dashboard.html', form=form, request_info=request_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info)
+
+
+@app.route('/identifierform', methods=['GET','POST'])
+def identifierform():
+    print('in trust form')
+    form = CreateTrustCalcForm()
+    if form.validate_on_submit():
+        print('Form validated')
+    else:
+        print(form.errors)
+    return render_template('identifier_form.html',form=form)
+
 
 @app.route('/submitrequest', methods=['GET','POST'])
 def submitrequest():
@@ -376,24 +621,24 @@ def viewdenied(req_id):
 def approvereq(req_id):
     
 
-    pendingreq_info = RequestForm.query.filter_by(requestid=req_id).all()
+    pendingreq_info = TrustCalcForm.query.filter_by(requestid=req_id).all()
     for i in pendingreq_info:
         i.status = 'approved'
         db.session.commit()
-    approvedreq_info = RequestForm.query.filter_by(status = 'approved').all()
-    denyreq_info = RequestForm.query.filter_by(status= 'denied').all()
-    pending_req = RequestForm.query.filter_by(status= 'pending').all()
-    for j in approvedreq_info:
-        print("Approved request is",j.requestname)
+    approvedreq_info = TrustCalcForm.query.filter_by(status = 'approved').all()
+    denyreq_info = TrustCalcForm.query.filter_by(status= 'denied').all()
+    pending_req = TrustCalcForm.query.filter_by(status= 'pending').all()
+    #for j in approvedreq_info:
+     #   print("Approved request is",j.requestname)
     
-    for i in pendingreq_info:
-        datasetinfo = Dataset.query.filter_by(datasetid = i.datasetid).all()
-    for j in datasetinfo:
-        dataset_name = j.nameset
-    pg_query = 'select * from data_catalog where dataset_name = %s'
-    cur.execute(pg_query,[dataset_name])
-    record = cur.fetchone()
-    print("Result",record)
+    #for i in pendingreq_info:
+     #   datasetinfo = Dataset.query.filter_by(datasetid = i.datasetid).all()
+    #for j in datasetinfo:
+     #   dataset_name = j.nameset
+    #pg_query = 'select * from data_catalog where dataset_name = %s'
+    #cur.execute(pg_query,[dataset_name])
+    #record = cur.fetchone()
+    #print("Result",record)
 
     return render_template('dashboard_admin.html',name = current_user.username, pending_req=pending_req, record = record, denyreq_info =denyreq_info, approvedreq_info = approvedreq_info)
 
@@ -420,19 +665,19 @@ def approvedadmin(req_id):
 @login_required
 def denyreq(req_id):
 
-    pendingreq_info = RequestForm.query.filter_by(requestid=req_id).all()
-    pending_req = RequestForm.query.filter_by(status= 'pending').all()
-    approvedreq_info = RequestForm.query.filter_by(status= 'approved').all()
+    pendingreq_info = TrustCalcForm.query.filter_by(requestid=req_id).all()
+    pending_req = TrustCalcForm.query.filter_by(status= 'pending').all()
+    approvedreq_info = TrustCalcForm.query.filter_by(status= 'approved').all()
     for i in pendingreq_info:
         i.status = 'denied'
         db.session.commit()
-    denyreq_info = RequestForm.query.filter_by(status = 'denied').all()
-
+    #denyreq_info = RequestForm.query.filter_by(status = 'denied').all()
+    denyreq_info = TrustCalcForm.query.filter_by(status = 'denied').all()
 
     return render_template('dashboard_admin.html', name = current_user.username, pending_req= pending_req, approvedreq_info=approvedreq_info, denyreq_info = denyreq_info)
 
 @app.route('/request',methods=['GET','POST'])
-def request():
+def request_form():
     form = CreateRequestForm()
     return render_template('request.html', form=form)
    # return render_template('bot/index_bot.html', form=form)
@@ -442,10 +687,27 @@ def enter_request():
     form = CreateRequestForm()
     return render_template('request.html', form=form)
 
-#@app.route('/chatpop', methods=['GET','POST'])
-#def chatpop():
- #   return render_template('chatpop.html')
+@app.route('/save_dialog', methods=['POST'])			
+def save_dialog():
+    a =request.form['data']
+    print type(a)
+    a=a.encode("utf-8")
+    print type(a)
+    dic =json.loads(a)
+    print type(dic)
+    print dic
+    text = dic[u'result'][u'resolvedQuery']
+    print type(text)
+    print text
 
-
+    #with sql.connect("database.db") as con:
+    # cur = con.cursor()
+        #cur.execute("INSERT data into trial (text, time) values (?,?)",(data, int(time())))
+    record=trial(data_set_name=text)
+    db.session.add(record)
+    db.session.commit()
+    return "Saved successfully"
+    #return "Failed to save."
+    
 if __name__ == '__main__':
     app.run(host = '0.0.0.0', debug=True)

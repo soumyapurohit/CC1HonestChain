@@ -178,12 +178,15 @@ $(document).ready(function() {
     // Main function: this method has the logic to handle differen parts of the response returned from the chat server
     function main(data) {
         console.log(data.result.fulfillment);
+	console.log(data.result.action);
+	//console.log(data.intent);
     	var action = data.result.action;
     	var speech = data.result.fulfillment.speech;
         // use incomplete if you use required in api.ai questions in intent
         // check if actionIncomplete = false
 	$.post( "/save_dialog", { data : JSON.stringify(data)}
-		
+	//$.get ( "/save_dialog", { data : JSON.stringify(data)}
+	//console.log(data.result.fulfillment.speech);
 		
     ); 
 	    

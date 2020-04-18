@@ -12,7 +12,6 @@ from sqlalchemy.engine import Engine
 from sqlalchemy import event
 import os
 import psycopg2
-import json
 
 from wtforms_sqlalchemy.fields import QuerySelectField
 #from wtforms.ext.sqlalchemy.fields import QuerySelectField
@@ -28,7 +27,6 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'
 #conn = psycopg2.connect("host=hbcdm.ce9qkwq3sggt.us-east-1.rds.amazonaws.com dbname=hbcdm user=hbadmin password=hbaccess")
 #cur = conn.cursor()
-#conn = psycopg2.connect("host=hbcdm.ce9qkwq3sggt.us-east-1.rds.amazonaws.com dbname=hbcdm user=hbadmin password=hbaccess")
 conn = psycopg2.connect("host=hbcdm.cdm9kks3s0wa.us-east-1.rds.amazonaws.com dbname=hbcdm user=hbadmin password=hbaccess")
 cur = conn.cursor()
 class User(UserMixin, db.Model):
@@ -60,11 +58,6 @@ class RequestForm(UserMixin, db.Model):
     datasetid =db.Column(db.Integer, db.ForeignKey('dataset.datasetid'), nullable=False)
     #requests = db.relationship('RequestForm', backref = 'user', lazy = True)
     #datasets = db.relationship('RequestForm', backref = 'dataset', lazy = True)
-
-class trial(UserMixin, db.Model):
-    data_set_name=db.Column(db.String(40),primary_key = True)
-
-
 class IrbInfo(UserMixin, db.Model):
     irbunique = db.Column(db.Integer, primary_key = True, autoincrement = True)
     irb_id = db.Column(db.String(10))
@@ -130,6 +123,7 @@ class IdentifierCalcForm(UserMixin, db.Model):
     photographic_image = db.Column(db.String(10))
     any_other_characteristics = db.Column(db.String(10))
     ownerid= db.Column(db.Integer, db.ForeignKey('user.id'),nullable=False)
+    
 
 #class SelectFieldtypedata(db.Model):
 #    datatype = db.Column(db.String(40))
@@ -137,13 +131,11 @@ class IdentifierCalcForm(UserMixin, db.Model):
 #class ChoiceOpts(FlaskForm):
 #    opts = QuerySelectField(query_factory = choice_dataset, allow_blank =True)
 
-
 def choice_irb():
     return IrbInfo.query
 
 def choice_trustcalc():
     return TrustChoice.query
-
 
 def choice_dataset():
     return Dataset.query
@@ -209,8 +201,6 @@ class CreateTrustCalcForm(FlaskForm):
      question = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
      audiotape = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
      #other = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
-
-
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -223,7 +213,7 @@ def login():
         if user:
             if user.password == form.password.data:
                 login_user(user, remember=form.remember.data)
-                return redirect(url_for('intro'))
+                return redirect(url_for('dashboard'))
         return '<h1> Invalid Username or password </h1>'
 
         #return '<h1>' + form.username.data + ' ' + form.password.data + '</h1>'
@@ -244,16 +234,12 @@ def signup():
 
     return render_template('signup.html', form=form)
 
-@app.route('/intro')
-@login_required
-def intro():
-    return render_template('intro.html')
 
 @app.route('/dashboard')
 @login_required
 def dashboard():
     #conn = psycopg2.connect("host=hbcdm.ce9qkwq3sggt.us-east-1.rds.amazonaws.com dbname=hbcdm user=hbadmin password=hbaccess")
-    cur = conn.cursor()
+    #cur = conn.cursor()
     
     #result =cur.execute("SELECT dataset_risk FROM data_catalog where 'dataset_name' = %s", [datasetname])
     #stmt = "SELECT * FROM data_catalog WHERE dataset_name = %s"
@@ -292,7 +278,7 @@ def dashboard():
         request_info = TrustCalcForm.query.filter_by(ownerid=current_user.id ,status = 'pending').all()
         deniedInternal_info = TrustCalcForm.query.filter_by(ownerid=current_user.id ,status = 'denied').all()
         for i in apprInternal_info:
-            print("Internal user approved request is ",i.requestname)
+            print("Internal user approved HIPAA request is ",i.trustid)
         return render_template('dashboard.html', name = current_user.username, apprInternal_info= apprInternal_info, request_info=request_info, deniedInternal_info = deniedInternal_info, resultset = resultset)
     else:
         print('external user dashboard')
@@ -323,7 +309,6 @@ def hipaaform():
     else:
         print(form.errors)
     return render_template('example2.html',form=form)
-
 
 @app.route('/pendrequest', methods=['GET','POST'])
 def pendrequest():
@@ -494,11 +479,9 @@ def submitrequest():
      for i in input_risk:
 
          total_risk += log(i);
-     print('total risk is', total_risk)
 
 
-     risk_factor = exp(total_risk);
-     print('risk factor is', risk_factor)
+     risk_factor = exp(log(total_risk));
      risk_level = "low";
 
      if(risk_factor >= (1.25 * data_risk)):
@@ -531,9 +514,9 @@ def submitrequest():
      datasetid = resultset[0]
 
      if(current_user.username == 'internaluser'):
-         return render_template('dashboard.html',name = current_user.username, form=form, request_info=request_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info, datasetid = datasetid)
+         return render_template('dashboard.html', form=form, request_info=request_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info, datasetid = datasetid)
      elif(current_user.username == 'externaluser'):
-         return render_template('dashboard.html', name = current_user.username, form=form, request_info=request_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info, datasetid = datasetid)
+         return render_template('dashboard.html', form=form, request_info=request_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info, datasetid = datasetid)
 
 
 @app.route('/viewmyreq/<req_id>', methods = ['GET',' POST'])
@@ -553,28 +536,28 @@ def viewmyreq(req_id):
 @login_required
 def viewpendingreq(req_id):
     
-    reqinfo = RequestForm.query.filter_by(requestid=req_id, status = 'pending').all()
-    for i in reqinfo:
-        print('The dataset id is',i.datasetid)
+    #reqinfo = TrustCalcForm.query.filter_by(requestid=req_id, status = 'pending').all()
+    #for i in reqinfo:
+        #print('The dataset id is',i.datasetid)
     #postgreSQL_select_Query = "select * from data_catalog  where data_catalog.dataset_name = %s"
     #cur.execute(postgreSQL_select_Query, [datasetprint])
     #resultset = cur.fetchone()
-    pendingreq_info = RequestForm.query.filter_by(requestid=req_id).all()
-    for i in pendingreq_info:
-        datasetinfo = Dataset.query.filter_by(datasetid = i.datasetid).all()
-    for j in datasetinfo:
-        dataset_name = j.nameset
-    pg_query = 'select * from data_catalog where dataset_name = %s'
-    cur.execute(pg_query,[dataset_name])
-    record = cur.fetchone()
-    print("Result",record)
+    pendingreq_info = TrustCalcForm.query.filter_by(trustid=req_id).all()
+    #for i in pendingreq_info:
+    #    datasetinfo = Dataset.query.filter_by(datasetid = i.datasetid).all()
+    #for j in datasetinfo:
+    #    dataset_name = j.nameset
+    #pg_query = 'select * from data_catalog where dataset_name = %s'
+    #cur.execute(pg_query,[dataset_name])
+    #record = cur.fetchone()
+    #print("Result",record)
 
     
     
     approvedreq_info = RequestForm.query.filter_by(status= 'approved').all()
     denyreq_info = RequestForm.query.filter_by(status= 'denied').all()
-
-    return render_template('viewpendingRequests.html', name = current_user.username, pendingreq_info = pendingreq_info, approvedreq_info=approvedreq_info, denyreq_info=denyreq_info, record =record)
+    return render_template('viewpendingRequests.html', pendingreq_info = pendingreq_info, approvedreq_info=approvedreq_info, denyreq_info=denyreq_info)
+    #return render_template('viewpendingRequests.html', pendingreq_info = pendingreq_info, approvedreq_info=approvedreq_info, denyreq_info=denyreq_info, record =record)
 # have to modify
 @app.route('/viewappInternal/<req_id>', methods = ['GET',' POST'])
 @login_required
@@ -602,7 +585,7 @@ def viewappInternal(req_id):
         #for column, value in v.items():
             #print('{0}: {1}'.format(column, value))
 
-    return render_template('viewdatauser.html',name = current_user.username, rowcount=rowcount, approvedreq_info = approvedreq_info, data = data)
+    return render_template('viewdatauser.html',rowcount=rowcount, approvedreq_info = approvedreq_info, data = data)
 # Have to modify
 @app.route('/viewdenied/<req_id>', methods = ['GET',' POST'])
 @login_required
@@ -613,7 +596,7 @@ def viewdenied(req_id):
         print(i.requestname)
 
 
-    return render_template('viewRequests.html', name = current_user.username, pendingreq_info = pendingreq_info)
+    return render_template('viewRequests.html', pendingreq_info = pendingreq_info)
 
 
 @app.route('/approvereq/<req_id>', methods = ['GET',' POST'])
@@ -621,7 +604,7 @@ def viewdenied(req_id):
 def approvereq(req_id):
     
 
-    pendingreq_info = TrustCalcForm.query.filter_by(requestid=req_id).all()
+    pendingreq_info = TrustCalcForm.query.filter_by(trustid=req_id).all()
     for i in pendingreq_info:
         i.status = 'approved'
         db.session.commit()
@@ -629,18 +612,18 @@ def approvereq(req_id):
     denyreq_info = TrustCalcForm.query.filter_by(status= 'denied').all()
     pending_req = TrustCalcForm.query.filter_by(status= 'pending').all()
     #for j in approvedreq_info:
-     #   print("Approved request is",j.requestname)
+        #print("Approved request is",j.requestname)
     
     #for i in pendingreq_info:
-     #   datasetinfo = Dataset.query.filter_by(datasetid = i.datasetid).all()
+    #    datasetinfo = Dataset.query.filter_by(datasetid = i.datasetid).all()
     #for j in datasetinfo:
-     #   dataset_name = j.nameset
+    #    dataset_name = j.nameset
     #pg_query = 'select * from data_catalog where dataset_name = %s'
     #cur.execute(pg_query,[dataset_name])
     #record = cur.fetchone()
     #print("Result",record)
 
-    return render_template('dashboard_admin.html',name = current_user.username, pending_req=pending_req, record = record, denyreq_info =denyreq_info, approvedreq_info = approvedreq_info)
+    return render_template('dashboard_admin.html', pending_req=pending_req, denyreq_info =denyreq_info, approvedreq_info = approvedreq_info)
 
 @app.route('/approvedadmin/<req_id>', methods = ['GET',' POST'])
 @login_required
@@ -659,25 +642,25 @@ def approvedadmin(req_id):
     cur.execute(record[4])
     data = cur.fetchall()
     rowcount = cur.rowcount
-    return render_template('viewdataadmin.html',name = current_user.username, rowcount=rowcount, data = data, approvedreq_info = approvedreq_info)
+    return render_template('viewdataadmin.html',rowcount=rowcount, data = data, approvedreq_info = approvedreq_info)
 
 @app.route('/denyreq/<req_id>', methods = ['GET',' POST'])
 @login_required
 def denyreq(req_id):
 
-    pendingreq_info = TrustCalcForm.query.filter_by(requestid=req_id).all()
+    pendingreq_info = TrustCalcForm.query.filter_by(trustid=req_id).all()
     pending_req = TrustCalcForm.query.filter_by(status= 'pending').all()
     approvedreq_info = TrustCalcForm.query.filter_by(status= 'approved').all()
     for i in pendingreq_info:
         i.status = 'denied'
         db.session.commit()
-    #denyreq_info = RequestForm.query.filter_by(status = 'denied').all()
     denyreq_info = TrustCalcForm.query.filter_by(status = 'denied').all()
 
-    return render_template('dashboard_admin.html', name = current_user.username, pending_req= pending_req, approvedreq_info=approvedreq_info, denyreq_info = denyreq_info)
+
+    return render_template('dashboard_admin.html', pending_req= pending_req, approvedreq_info=approvedreq_info, denyreq_info = denyreq_info)
 
 @app.route('/request',methods=['GET','POST'])
-def request_form():
+def request():
     form = CreateRequestForm()
     return render_template('request.html', form=form)
    # return render_template('bot/index_bot.html', form=form)
@@ -687,27 +670,6 @@ def enter_request():
     form = CreateRequestForm()
     return render_template('request.html', form=form)
 
-@app.route('/save_dialog', methods=['POST'])			
-def save_dialog():
-    a =request.form['data']
-    print type(a)
-    a=a.encode("utf-8")
-    print type(a)
-    dic =json.loads(a)
-    print type(dic)
-    print dic
-    text = dic[u'result'][u'resolvedQuery']
-    print type(text)
-    print text
 
-    #with sql.connect("database.db") as con:
-    # cur = con.cursor()
-        #cur.execute("INSERT data into trial (text, time) values (?,?)",(data, int(time())))
-    record=trial(data_set_name=text)
-    db.session.add(record)
-    db.session.commit()
-    return "Saved successfully"
-    #return "Failed to save."
-    
 if __name__ == '__main__':
     app.run(host = '0.0.0.0', debug=True)
