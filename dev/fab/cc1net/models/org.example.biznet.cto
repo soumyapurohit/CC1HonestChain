@@ -16,7 +16,7 @@
  * Write your model definitions here
  */
 
-namespace org.example.biznet
+namespace org.cc1.net
 
 /**
  * My commodity trading network
@@ -36,4 +36,4 @@ participant Trader identified by tradeId {
 transaction Trade {
     --> Commodity commodity
     --> Trader newOwner
-}
+} 

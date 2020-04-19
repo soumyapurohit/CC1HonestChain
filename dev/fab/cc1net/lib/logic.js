@@ -19,7 +19,7 @@
 
 /**
  * Track the trade of a commodity from one trader to another
- * @param {org.example.biznet.Trade} trade - the trade to be processed
+ * @param {org.cc1.net.Trade} trade - the trade to be processed
  * @transaction
  */
 async function tradeCommodity(trade) {
