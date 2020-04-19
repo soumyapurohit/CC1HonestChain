@@ -8,11 +8,9 @@ Dashboard
 {% block styles %}
 {{super()}}
 <script>
-	function view(reqid){
-		document.getElementById(reqid).innerHTML = reqid;
+	//function view(reqid){
+		//document.getElementById(reqid).innerHTML = reqid;
 		//reqidnew  = "reqid"
-		var link = "{{url_for('viewmyreq', req_id ='reqid') }}".replace('reqid', reqid);
-		window.location.href= link;
 		//var base_url = window.location.origin;
 		//var page_url = '/viewmyreq';
 		//var parameters = '?req_id=' +reqid;
@@ -24,7 +22,7 @@ Dashboard
 		//var link  = page_url + parameters;
 		//window.location.href= link;
 		//document.getElementById('req').innerHTML = reqid;
-	}
+	//}
 	//$('req').onclick(view()
 	//	{alert("hello world"); })
 	        function viewappInternal(reqid){
@@ -65,7 +63,7 @@ Dashboard
             <li><a href="#">Dashboard</a></li>
             <li><a href="#">Settings</a></li>
             <li><a href="#">Profile</a></li>
-            <li><a href=" {{url_for('logout') }}">Logout</a></li>
+	    <li><a href=" {{url_for('logout') }}">Logout</a></li>
           </ul>
           <form class="navbar-form navbar-right">
             <input type="text" class="form-control" placeholder="Search...">
@@ -97,10 +95,16 @@ Dashboard
           </ul>
 	</div>   -->
        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-               <h1 class="page-header">Welcome ,{{name}}</h1>
-		<form action =" {{url_for('request') }} " method ="get">
-			<input type = "submit"class = "btn btn-info" value="New Request">
+               <h1 class="page-header">Welcome , {{name}}</h1>
+		<form action =" {{url_for('request_form') }} " method ="get">
+			<input type = "submit"class = "btn btn-success" value="Request Form">
 		</form>
+		<form action =" {{url_for('hipaaform') }} " method ="get">
+                        <input type = "submit"class = "btn btn-success" value="Domain Form">
+                </form>
+		<!--<form action =" {{url_for('identifierform') }} " method ="get">
+                        <input type = "submit"class = "btn btn-info" value="Identifier Form Entry">
+		</form> -->
 	 	<div w3-include-html="/home/ubuntu/HonestChain/templates/bot/index_bot.html"></div>
           <h2 class="sub-header">Pending Request</h2>
           <div class="table-responsive">
@@ -115,7 +119,8 @@ Dashboard
               <tbody>
                 <tr>
 			{% for new_request in request_info %}
-			<td><a href = "#"  onclick = "view('{{new_request.requestid}}')" id = '{{new_request.requestid}}'  method ="GET">{{new_request.requestid}}</a></td>
+	<td><a href = "#"  onclick = "view('{{new_request.requestid}}')" id = '{{new_request.requestid}}'  method ="GET">{{new_request.requestid}}</a></td>
+	<!--	<td><a href = " {{url_for('pendrequest') }} ">{{new_request.requestid}}</a></td> -->
 			<td id = "requestname">{{new_request.requestname}}</td>
 			<td>{{new_request.requestDescription}}</td> 
     			
@@ -136,9 +141,9 @@ Dashboard
                     <tbody>
                             <tr>
 				    {% for apprInternal_info in apprInternal_info %}
-				    <td><a href = "#"  onclick = "viewappInternal('{{apprInternal_info.requestid}}')" id = '{{apprInternal_info.requestid}}'  method ="GET">{{apprInternal_info.requestid}}</a></td>
-				    <td id = "requestname">{{apprInternal_info.requestname}}</td>
-                                    <td>{{apprInternal_info.requestDescription}}</td>
+				    <td><a href = "#"  onclick = "viewappInternal('{{apprInternal_info.trustid}}')" id = '{{apprInternal_info.trustid}}'  method ="GET">{{apprInternal_info.trustid}}</a></td>
+				    <td id = "requestname">{{apprInternal_info.status}}</td>
+                                    <td>{{apprInternal_info.status}}</td>
                                     
                             </tr>
 			    {% endfor %}
@@ -158,9 +163,9 @@ Dashboard
                     <tbody>
                             <tr>
                                     {% for deniedInternal_info in deniedInternal_info %}
-				    <td><a href = "#"  id = '{{deniedInternal_info.requestid}}' method ="GET">{{deniedInternal_info.requestid}}</a></td>
-                                    <td id = "requestname">{{deniedInternal_info.requestname}}</td>
-                                    <td>{{deniedInternal_info.requestDescription}}</td>
+				    <td><a href = "#"  id = '{{deniedInternal_info.trustid}}' method ="GET">{{deniedInternal_info.trustid}}</a></td>
+                                    <td id = "requestname">{{deniedInternal_info.status}}</td>
+                                    <td>{{deniedInternal_info.status}}</td>
                                    
                             </tr>
 			    {% endfor %}
@@ -170,8 +175,3 @@ Dashboard
       </div>
     </div>
 {% endblock %}
-                                                                                                                                                                                          
-                                                                                                                                                                                         
-                                                                                                                                                                                        
-                                                                                                                                                                                         
-                                                                                                                                                                                         

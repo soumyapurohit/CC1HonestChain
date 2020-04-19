@@ -59,7 +59,7 @@ Dashboard
             <li><a href="#">Dashboard</a></li>
             <li><a href="#">Settings</a></li>
             <li><a href="#">Profile</a></li>
-            <li><a href=" {{url_for('logout') }}">Logout</a></li>
+            <li><a href=" {{url_for('logout') }}"></a></li>
           </ul>
           <form class="navbar-form navbar-right">
             <input type="text" class="form-control" placeholder="Search...">
@@ -91,7 +91,7 @@ Dashboard
         </div>  -->
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
                <h1 class="page-header">Welcome , {{name}}</h1>
-               <!-- <form action =" {{url_for('request') }} " method ="get">
+               <!-- <form action =" " method ="get">
                         <input type = "submit"class = "btn btn-info" value="New Request">
 	       </form>-->
 
@@ -109,9 +109,9 @@ Dashboard
               <tbody>
                 <tr>
                         {% for pending_req in pending_req %}
-                        <td><a href = "#"  onclick = "view('{{pending_req.requestid}}')" id = '{{pending_req.requestid}}'  method ="GET">{{pending_req.requestid}}</a></td>
-                        <td id = "requestname">{{pending_req.requestname}}</td>
-                        <td>{{pending_req.requestDescription}}</td>
+                        <td><a href = "#"  onclick = "view('{{pending_req.trustid}}')" id = '{{pending_req.trustid}}'  method ="GET">{{pending_req.trustid}}</a></td>
+                        <td id = "requestname">{{pending_req.status}}</td>
+                        <td>{{pending_req.status}}</td>
                         
                 </tr>
 		{% endfor %}
@@ -130,9 +130,9 @@ Dashboard
                     <tbody>
                             <tr>
 				  {% for approvedreq_info in approvedreq_info %}
-				  <td><a href = "#"  onclick = "viewapprovedadmin('{{approvedreq_info.requestid}}')" id = '{{approvedreq_info.requestid}}'  method ="GET">{{approvedreq_info.requestid}}</a></td>
-				  <td>{{approvedreq_info.requestname}}</td>
-				  <td>{{approvedreq_info.requestDecription}}</td>
+				  <td><a href = "#"  onclick = "viewapprovedadmin('{{approvedreq_info.requestid}}')" id = '{{approvedreq_info.trustid}}'  method ="GET">{{approvedreq_info.trustid}}</a></td>
+				  <td>{{approvedreq_info.status}}</td>
+				  <td>{{approvedreq_info.status}}</td>
                             </tr>
 			     {% endfor %}
                     </tbody>
@@ -151,9 +151,9 @@ Dashboard
                     <tbody>
                             <tr>
                               {% for denyreq_info in denyreq_info %}
-                                  <td><a href = "#"  id = '{{denyreq_info.requestid}}'  method ="GET">{{denyreq_info.requestid}}</a></td>
-                                  <td>{{denyreq_info.requestname}}</td>
-                                  <td>{{denyreq_info.requestDecription}}</td>
+                                  <td><a href = "#"  id = '{{denyreq_info.trustid}}'  method ="GET">{{denyreq_info.trustid}}</a></td>
+                                  <td>{{denyreq_info.status}}</td>
+                                  <td>{{denyreq_info.status}}</td>
                             </tr>
                              {% endfor %}
                     </tbody>
@@ -162,4 +162,4 @@ Dashboard
       </div>
     </div>
 {% endblock %}
-"dashboard.html" 158L, 6724C                                                                                                                                    14,82-96      Top
+"dashboard.html" 158L, 6724C  
