@@ -22,7 +22,7 @@
  * @param {org.cc1.net.Trade} trade - the trade to be processed
  * @transaction
  */
-async function tradeCommodity(trade) {
+async function trade(trade) {
     trade.commodity.owner = trade.newOwner;
     let assetRegistry = await getAssetRegistry('org.example.biznet.Commodity');
     await assetRegistry.update(trade.commodity);
