@@ -1,4 +1,3 @@
-
 /**
  * Track the trade of a commodity from one trader to another
  * @param {org.cc1.net.Trade} trade - the trade to be processed
