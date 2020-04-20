@@ -34,10 +34,11 @@ participant Trader identified by tradeId {
     o String lastName
 }
 transaction Trade {
-    --> Commodity commodity
-    --> Trader newOwner
     o Double ds
     o Double cs
+    --> Commodity commodity
+    --> Trader newOwner
+
 
 
 }                                                                         
