@@ -3,7 +3,7 @@
     "composer": "^0.19.20"
   },
   "name": "cc1net",
-  "version": "0.0.1",
+  "version": "0.0.5",
   "description": "na",
   "scripts": {
     "prepublish": "mkdirp ./dist && composer archive create --sourceType dir --sourceName . -a ./dist/cc1net.bna",

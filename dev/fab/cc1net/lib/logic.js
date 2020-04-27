@@ -15,11 +15,11 @@ async function trade(trade) {
         risk = 1; 
     }
 
-    trade.commodity.owner = trade.newOwner;
-    let assetRegistry = await getAssetRegistry('org.cc1.net.Commodity');
     if(risk == 1){
-        await assetRegistry.update(trade.commodity);
+   	trade.commodity.owner = trade.newOwner;
+    	let assetRegistry = await getAssetRegistry('org.cc1.net.Commodity');
+    	await assetRegistry.update(trade.commodity);
     }else{
-        return {'trust':trust};
+       throw new Error(`trust = ${risk}`);
     }
 }
