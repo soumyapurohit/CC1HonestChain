@@ -19,67 +19,48 @@
 
 /**
  * Sample transaction
- * @param {org.honestchain.SampleTransaction} sampleTransaction
+ * @param {org.honestchain.ChainTransaction} chainTransaction
  * @transaction
  */
-async function sampleTransaction(tx) {
-    // Save the old value of the asset.
-    //const oldValue = tx.asset.value;
+async function chainTransaction(tx) {
+    // Get the asset registry for the asset.
+    const assetRegistry = await getAssetRegistry('org.honestchain.Dataset');
+    let event = getFactory().newEvent('org.honestchain', 'SampleEvent');
 
-    // Update the asset with the new value.
-    var inputcs, inputdr;
-    //console.log("tasklist of cs is", tx.tasklist.cs);
-    //console.log("tasklist of dr is", tx.tasklist.dr);
-    //console.log("tasklist id is", tx.tasklist.task_id);
-    tx.tasklist.inputcs = tx.inputcs;
-    tx.tasklist.inputdr = tx.inputdr;
-    var avg  = (tx.tasklist.inputcs + tx.tasklist.inputdr)/2;
-    //var avg = 3;
-    //console.log("average is", avg);
+    var avg  = (tx.inputcs + tx.inputdr)/2;
     var risk_level = "low";
     var decision = "approved";
-    var base_reputation = 10;
+    var base_reputation = tx.user.reputation;
     var reputation = 0;
     if (avg <= 3) {
 	    risk_level = "low";
 	    decision = "approved";
-      	    reputation = reputation + base_reputation + 1 ;
+      reputation = reputation + base_reputation + 1 ;
     }
     else if (avg > 3 && avg <= 7) {
 	    risk_level = "medium";
-      	    decision = "manual approval required";
-            reputation = reputation + base_reputation + 0 ;
+      decision = "manual approval required";
+      reputation = reputation + base_reputation + 0 ;
     }
     else {
 	    risk_level = "high";
-      	    decision = "denied";
-            reputation = reputation + base_reputation - 1 ;
+      decision = "denied";
+      reputation = reputation + base_reputation - 1 ;
     }
-    tx.tasklist.decision = decision;
-    tx.tasklist.risk_level = risk_level;
-    tx.tasklist.reputation = reputation;
-    //tx.tasklist.cs = tx.newcs;
-    //tx.tasklist.dr = tx.newdr;
-   
-    tx.newDecision = tx.tasklist.decision;
-    tx.new_risk_level = tx.tasklist.risk_level;
-    tx.new_reputation = tx.tasklist.reputation;
-    
-    // Get the asset registry for the asset.
-    const assetRegistry = await getAssetRegistry('org.honestchain.TaskList');
-    // Update the asset in the asset registry.
-    await assetRegistry.update(tx.tasklist);
+    tx.dataset.decision = decision;
+    tx.dataset.risk_level = risk_level;
+    tx.dataset.reputation = reputation;
+    tx.dataset.last_requester = tx.user;
 
-    // Emit an event for the modified asset.
-    let event = getFactory().newEvent('org.honestchain', 'SampleEvent');
-    event.tasklist = tx.tasklist;
-    //event.newCS = tx.inputcs;
-    //event.newdr = tx.inputdr;
-    event.newDecision = tx.newDecision;
-    event.new_risk_level = tx.new_risk_level;
-    event.new_reputation = tx.new_reputation;
+    // Update the asset with the new value.
+    await assetRegistry.update(tx.dataset);
+    
+    // Update the asset in the asset registry.
+    event.dataset = tx.dataset;
+    event.newDecision = decision;
+    event.new_risk_level = risk_level;
+    event.new_reputation = tx.dataset.reputation;
     event.inputcs = tx.inputcs;
     event.inputdr = tx.inputdr; 
-  	//event.newavg = tx.avg
     emit(event);
 }
