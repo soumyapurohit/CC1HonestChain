@@ -14,7 +14,7 @@ participant User identified by userId {
 asset Dataset identified by datasetId { 
   o String datasetId 
   o String risk_level default = 'low' 
-  o String decision default = 'approved'
+  o String decision default = 'pending'
   o String reputation default = '10'  
   --> User last_requester
   // --> Provider provider
