@@ -30,7 +30,7 @@ async function chainTransaction(tx) {
     var avg  = (tx.inputcs + tx.inputdr)/2;
     var risk_level = "low";
     var decision = "approved";
-    var base_reputation = parseInt(tx.user.reputation);
+    var base_reputation = tx.user.reputation;
     var reputation = 0;
     if (avg <= 3) {
 	    risk_level = "low";
@@ -49,7 +49,7 @@ async function chainTransaction(tx) {
     }
     tx.dataset.decision = decision;
     tx.dataset.risk_level = risk_level;
-    tx.dataset.reputation = reputation.toString();
+    tx.dataset.reputation = reputation;
     tx.dataset.last_requester = tx.user;
 
     // Update the asset with the new value.

@@ -1,7 +1,8 @@
 namespace org.honestchain
 
-participant User identified by userId {
-  o String userId
+participant User identified by username {
+  o String username
+  o Integer userId
   o String reputation default = '10' 
 }
 
@@ -11,8 +12,9 @@ participant User identified by userId {
 //   o String reputation default = '10' 
 // }
 
-asset Dataset identified by datasetId { 
-  o String datasetId 
+asset Dataset identified by requestId { 
+  o String datasetId
+  o String requestId 
   o String risk_level default = 'low' 
   o String decision default = 'pending'
   o String reputation default = '10'  
@@ -40,6 +42,8 @@ transaction ChainTransaction {
   // o Integer new_reputation
   o Integer inputcs
   o Integer inputdr
+  o String datasetId
+  o String requestId
   --> Dataset dataset
   --> User user
   
@@ -51,6 +55,7 @@ event SampleEvent {
   o Integer inputdr optional
   o Integer inputcs optional
   o String new_risk_level
-  o Integer new_reputation
+  o String new_reputation
+  
   //o String newavg
 }

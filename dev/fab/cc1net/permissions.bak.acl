@@ -75,7 +75,7 @@ rule Default {
     description: "Allow all participants access to all resources"
     participant: "ANY"
     operation: ALL
-    resource: "org.honestchain.*"
+    resource: "org.cc1.net.*"
     action: ALLOW
 }
 
@@ -86,4 +86,3 @@ rule SystemACL {
   resource: "org.hyperledger.composer.system.**"
   action: ALLOW
 }
-
